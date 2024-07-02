@@ -3,7 +3,7 @@ cnopts = pysftp.CnOpts()
 cnopts.hostkeys = None
 
 
-def sftp_upload(sHostName,PATHS,FILES):
+def sftp_upload(sHostName,PATHS,FILES,PPK=""):
     
     PATHS = PATHS.split("/")
     
@@ -15,16 +15,34 @@ def sftp_upload(sHostName,PATHS,FILES):
         sUserName = 'sftpuser'
         sPassWord = 'sftpuser'
 
+    elif(sHostName == 'mft-ap.st.com'):
+        sUserName = 'tonghsing_996Z'
+        sPassWord = 'xxx'
+        PPK = "/home/cim/global_fun/PublicKeyForST/STSFTP_DSAKEY"
+        
+
+    if PPK =="":
+
+        srv = pysftp.Connection(sHostName, username=sUserName, password=sPassWord, cnopts=cnopts) 
+
+    else:
+
+        srv = pysftp.Connection(sHostName, username=sUserName, private_key=PPK, cnopts=cnopts) 
+
         
     if(sUserName):
-        with pysftp.Connection(sHostName, username=sUserName, password=sPassWord, cnopts=cnopts) as sftp:
+        with srv as sftp:
 
             for p in PATHS :
                 #print(p)
                 path_exist  = True if p in sftp.listdir() else False
                 
                 if not path_exist  and p!= '':
-                    sftp.mkdir(p)
+                    try:
+                        sftp.mkdir(p)
+
+                    except Exception as E:
+                        print("mkdir fail : " +p+"--"+str(E))
 
                 sftp.cwd(p)
 
@@ -35,5 +53,8 @@ def sftp_upload(sHostName,PATHS,FILES):
                     sftp.put(i)
 
             elif(type(FILES) == str):
+                try:
+                    sftp.put(FILES)
 
-                sftp.put(FILES)
+                except Exception as E:
+                    print(str(E))

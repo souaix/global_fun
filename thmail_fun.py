@@ -17,7 +17,7 @@ import smtplib
 
 def thmail(program,contents,attachments,subject):
     #寄件人
-    from_address = 'CIM.ROBOT@theil.com.tw'
+    from_address = 'CIM.ROBOT@theil.com'
     #收件人
     sql = "SELECT address from rec_list WHERE program ='"+program+"'"
     df = pd.read_sql(sql,eng_cim)    
